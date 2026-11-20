@@ -1,0 +1,27 @@
+databases:
+  - name: devhub-db
+    plan: free
+    databaseName: devhub
+    user: devhub
+
+services:
+  - type: web
+    name: devhub
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: DATABASE_URL
+        fromDatabase:
+          name: devhub-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: MAX_VIDEOS
+        value: "30"

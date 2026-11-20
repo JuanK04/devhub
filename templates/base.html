@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}DevHub · Videos de programación, ciberseguridad e IA{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="{{ url_for('index') }}">&lt;/&gt; DevHub</a>
+    <nav>
+      <a href="{{ url_for('index') }}">Inicio</a>
+      {% if is_admin %}
+        <a href="{{ url_for('admin') }}">Administrar</a>
+        <form method="post" action="{{ url_for('logout') }}" class="inline">
+          <input type="hidden" name="csrf" value="{{ csrf_token }}">
+          <button class="link">Salir</button>
+        </form>
+      {% else %}
+        <a href="{{ url_for('login') }}">Admin</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="wrap">
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}<p class="flash {{ cat }}">{{ msg }}</p>{% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="foot">Videos alojados en YouTube · Cada video pertenece a su autor.</footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

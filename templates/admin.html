@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Administrar · DevHub{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Agregar recurso</h1>
+  <p class="muted">Videos: {{ n_videos }} / {{ max_videos }}. Los enlaces a otras plataformas no cuentan para el límite.</p>
+  <form method="post" action="{{ url_for('admin_add') }}" class="form-grid">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Tipo
+      <select name="kind" id="kind">
+        <option value="video">Video de YouTube</option>
+        <option value="enlace">Enlace externo</option>
+      </select>
+    </label>
+    <label>Categoría
+      <select name="category" required>
+        {% for key, label in CATEGORIES.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="full">Título <input name="title" maxlength="200" required></label>
+    <label class="full">URL <input name="url" id="url" placeholder="https://www.youtube.com/watch?v=…" required></label>
+    <label id="channel-row">Canal <input name="channel" maxlength="120"></label>
+    <label class="full">Descripción <textarea name="description" maxlength="400" rows="2"></textarea></label>
+    <button class="btn">Guardar</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Recursos actuales</h2>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Tipo</th><th>Título</th><th>Categoría</th><th></th></tr></thead>
+    <tbody>
+    {% for r in items %}
+      <tr>
+        <td>{{ 'Video' if r.kind == 'video' else 'Enlace' }}</td>
+        <td><a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r.title }}</a></td>
+        <td>{{ CATEGORIES.get(r.category, r.category) }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin_delete', rid=r.id) }}"
+                onsubmit="return confirm('¿Eliminar este recurso?')">
+            <input type="hidden" name="csrf" value="{{ csrf_token }}">
+            <button class="btn danger sm">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const kind = document.getElementById('kind'), row = document.getElementById('channel-row'),
+        url = document.getElementById('url');
+  kind.addEventListener('change', () => {
+    const v = kind.value === 'video';
+    row.hidden = !v;
+    url.placeholder = v ? 'https://www.youtube.com/watch?v=…' : 'https://…';
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Aprende programación, ciberseguridad e IA con agentes</h1>
+  <p>{{ videos|length }} videos de YouTube seleccionados. Haz clic en una miniatura para reproducirla aquí mismo.</p>
+</section>
+
+<section class="controls">
+  <input id="q" type="search" placeholder="Buscar por título, canal o tema…" aria-label="Buscar">
+  <div class="chips" role="group" aria-label="Filtrar por categoría">
+    <button class="chip active" data-cat="all">Todos</button>
+    {% for key, label in CATEGORIES.items() %}
+      <button class="chip" data-cat="{{ key }}">{{ label }}</button>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="grid" class="grid">
+  {% for v in videos %}
+  <article class="card" data-cat="{{ v.category }}"
+           data-text="{{ (v.title ~ ' ' ~ v.channel ~ ' ' ~ v.description)|lower }}">
+    <button class="thumb" data-id="{{ v.youtube_id }}" aria-label="Reproducir {{ v.title }}">
+      <img loading="lazy" src="https://i.ytimg.com/vi/{{ v.youtube_id }}/hqdefault.jpg" alt="Miniatura de {{ v.title }}">
+      <span class="play">▶</span>
+    </button>
+    <div class="body">
+      <span class="tag {{ v.category }}">{{ CATEGORIES.get(v.category, v.category) }}</span>
+      <h3>{{ v.title }}</h3>
+      <p class="channel">{{ v.channel }}</p>
+      <p class="desc">{{ v.description }}</p>
+      <a class="yt" href="{{ v.url }}" target="_blank" rel="noopener noreferrer">Ver en YouTube ↗</a>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+<p id="empty" class="empty" hidden>No hay videos que coincidan con tu búsqueda.</p>
+
+<section class="more">
+  <h2>Más recursos</h2>
+  {% if links %}
+  <ul class="links">
+    {% for l in links %}
+    <li>
+      <a href="{{ l.url }}" target="_blank" rel="noopener noreferrer">{{ l.title }} ↗</a>
+      <span class="tag {{ l.category }}">{{ CATEGORIES.get(l.category, l.category) }}</span>
+      <p>{{ l.description }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="empty">Aún no hay recursos adicionales.</p>{% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}"></script>{% endblock %}
